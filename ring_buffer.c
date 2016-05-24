@@ -46,7 +46,8 @@ void * consumer_proc(void *arg)
     student_info stu_info; 
     while(1)
     {
-    usleep(200000);
+    //usleep(1000000);
+    usleep(2000000);
     printf("------------------------------------------\n");
     printf("get a student info from ring buffer.\n");
     ring_buffer_get(ring_buf, (void *)&stu_info, sizeof(student_info));
@@ -72,12 +73,12 @@ void * producer_proc(void *arg)
     ring_buffer_put(ring_buf, (void *)stu_info, sizeof(student_info));
     printf("ring buffer length: %u\n", ring_buffer_len(ring_buf));
     printf("******************************************\n");
-    usleep(100000);
+    usleep(1000000);
     }
     return (void *)ring_buf;
 }
 
-int consumer_thread(void *arg)
+pthread_t consumer_thread(void *arg)
 {
     int err;
     pthread_t tid;
@@ -90,7 +91,7 @@ int consumer_thread(void *arg)
     }
     return tid;
 }
-int producer_thread(void *arg)
+pthread_t producer_thread(void *arg)
 {
     int err;
     pthread_t tid;
@@ -143,6 +144,7 @@ int main()
     printf("multi thread test.......\n");
     produce_pid  = producer_thread((void*)ring_buf);
     consume_pid  = consumer_thread((void*)ring_buf);
+    printf("producer_id:%d, consume_pid:%d\n", produce_pid, consume_pid);
     pthread_join(produce_pid, NULL);
     pthread_join(consume_pid, NULL);
     ring_buffer_free(ring_buf);
